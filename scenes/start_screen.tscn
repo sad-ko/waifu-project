@@ -1,4 +1,4 @@
-[gd_scene load_steps=21 format=2]
+[gd_scene load_steps=18 format=2]
 
 [ext_resource path="res://scripts/start_screen.gd" type="Script" id=1]
 [ext_resource path="res://assets/fonts/alienEncounters/SFAlienEncountersSolid.ttf" type="DynamicFontData" id=2]
@@ -6,7 +6,6 @@
 [ext_resource path="res://assets/grain.jpg" type="Texture" id=6]
 [ext_resource path="res://assets/fonts/Vintage.ttf" type="DynamicFontData" id=7]
 [ext_resource path="res://resources/start_button.stylebox" type="StyleBox" id=8]
-[ext_resource path="res://assets/fonts/DM-80-Regular.otf" type="DynamicFontData" id=9]
 [ext_resource path="res://assets/synthwaveJapan.png" type="Texture" id=10]
 [ext_resource path="res://assets/synthwaveJapanApagado.png" type="Texture" id=11]
 
@@ -114,12 +113,6 @@ tracks/2/keys = {
 "times": PoolRealArray( 0, 1, 2 )
 }
 
-[sub_resource type="StyleBoxFlat" id=17]
-bg_color = Color( 0.133333, 0.133333, 0.133333, 1 )
-
-[sub_resource type="DynamicFont" id=16]
-font_data = ExtResource( 9 )
-
 [node name="StartScreen" type="Control"]
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -212,19 +205,3 @@ text = "Start"
 anims/RESET = SubResource( 1 )
 anims/starting_up = SubResource( 2 )
 anims/starting_up_loop = SubResource( 15 )
-
-[node name="PopupDialog" type="PopupDialog" parent="."]
-anchor_right = 1.0
-margin_bottom = 75.0
-custom_styles/panel = SubResource( 17 )
-popup_exclusive = true
-
-[node name="RichTextLabel" type="RichTextLabel" parent="PopupDialog"]
-anchor_right = 1.0
-anchor_bottom = 1.0
-margin_left = 10.0
-margin_top = 10.0
-margin_right = -10.0
-margin_bottom = -10.0
-custom_colors/default_color = Color( 1, 0.380392, 0.380392, 1 )
-custom_fonts/normal_font = SubResource( 16 )

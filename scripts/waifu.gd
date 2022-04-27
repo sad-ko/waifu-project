@@ -8,24 +8,16 @@ export(NodePath) onready var skills = get_node(skills) as OptionButton
 export(NodePath) onready var clear_text = get_node(clear_text) as Button
 export(int) var text_speed : int = 24
 #------------------------------------------------------------------------------#
-var initialization : FuncRef = null
-var plugins_folder : String
+var plugins_folder : String = "plugins/"
 var tween : Node
-#------------------------------------------------------------------------------#
-func _init() -> void:
-	if OS.is_debug_build():
-		plugins_folder = "./bin/plugins/"
-	else:
-		plugins_folder = "./plugins/"
 #------------------------------------------------------------------------------#
 func _ready() -> void:
 	clear_text.hide()
 	tween = Tween.new()
 	speech.add_child(tween)
 	var _err = tween.connect("tween_all_completed", self, "_end_speak")
-	
-	yield(get_parent(), "ready")
-	yield(get_parent().start_menu, "tree_exited")
+#------------------------------------------------------------------------------#	
+func start_up() -> void:
 	speak(["hi~", "hewwo, even..."])
 	terminal.grab_focus()
 #------------------------------------------------------------------------------#

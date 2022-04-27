@@ -1,47 +1,53 @@
 #------------------------------------------------------------------------------#
 extends Node
+signal all_loaded
 #------------------------------------------------------------------------------#
 onready var start_menu = $StartScreen
 onready var waifu = $Waifu
+onready var warning = $Warning
+onready var print_error = $Warning/Text
 #------------------------------------------------------------------------------#
-var abilities_file_path : String
-var abilities : Dictionary
-#------------------------------------------------------------------------------#
-func _init() -> void:
-	if OS.is_debug_build():
-		abilities_file_path = "res://bin/abilities.wa"
-	else:
-		abilities_file_path = "./abilities.wa"
+var abilities_file_path : String = "configs/abilities.wa"
 #------------------------------------------------------------------------------#
 func _ready() -> void:
-	start_menu.initialization = funcref(self, "load_abilities")
-	waifu.initialization = funcref(self, "create_abilities")
+	var _err = connect("all_loaded", start_menu, "enable_button")
+	_err = start_menu.connect("tree_exited", waifu, "start_up")
+	
+	var abilities : Dictionary = load_abilities()
+	
+	if not abilities.empty():
+		create_abilities(abilities, waifu.skills)
+	else:
+		_print_err(["[ERROR] - %s is empty." % abilities_file_path])
+		return
+	
+	emit_signal("all_loaded")
 #------------------------------------------------------------------------------#
-func load_abilities() -> PoolStringArray:
+func load_abilities() -> Dictionary:
+	var abilities : Dictionary = {}
 	var errors : PoolStringArray = []
 	var file = File.new()
+	
 	var _err = file.open(abilities_file_path, File.READ)
 	if _err:
-		printerr("[ERROR] - File %s could not be opened." % abilities_file_path)
 		errors.append("[ERROR] - File %s could not be opened." % abilities_file_path)
-		return errors
+		_print_err(errors)
+		return {}
 
 	var parsed_json : JSONParseResult = JSON.parse(file.get_as_text())
 	if parsed_json.error:
-		printerr("[ERROR] - JSON file could not be parsed")
 		errors.append("[ERROR] - JSON file could not be parsed")
-		printerr("%s - %s in Line.%d" % [abilities_file_path, parsed_json.error_string, parsed_json.error_line])
 		errors.append("%s - %s in Line.%d" % [abilities_file_path, parsed_json.error_string, parsed_json.error_line])
-		return errors
+		_print_err(errors)
+		return {}
 
 	abilities = parsed_json.result
 	file.close()
-	create_abilities(waifu.skills)
-	return errors
+	return abilities
 #------------------------------------------------------------------------------#
-func create_abilities(skills:Node) -> void:
+func create_abilities(abilities:Dictionary, skills:Node) -> void:
 	if abilities.empty():
-		printerr("[ERROR] - Abilites dictionary is empty")
+		_print_err(["[ERROR] - Abilites dictionary is empty"])
 		return
 
 	for key in abilities:
@@ -49,5 +55,11 @@ func create_abilities(skills:Node) -> void:
 			if typeof(ability) == TYPE_STRING:
 				skills.add_item(ability)
 				skills.set_item_metadata(skills.get_item_count()-1, key)
-	start_menu.enable_button()
+#------------------------------------------------------------------------------#
+func _print_err(errors:PoolStringArray) -> void:
+	for error in errors:
+		print_error.add_text(error + "\n")
+		printerr(error)
+	warning.popup()
+	get_tree().set_pause(true)
 #------------------------------------------------------------------------------#
